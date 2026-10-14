@@ -39,7 +39,6 @@ const START_FELDER = {
   ma: "",
   kosten: "9000",
   gehalt: "3500",
-  tn: "1",
   monate: "6",
   stunden: "42",
   regel: "160",
@@ -133,7 +132,6 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
   const [req, setReq] = useState<Record<Req, boolean>>({ std: false, abschluss: false, sv: false });
   const [progs, setProgs] = useState<string[]>([]);
   const [angebote, setAngebote] = useState<string[]>([]);
-  const [tnManual, setTnManual] = useState(false);
   const [tnZeilen, setTnZeilen] = useState<TnZeile[]>([]);
   const [f, setF] = useState<Felder>(START_FELDER);
   const [toast, setToast] = useState<{ text: string; an: boolean }>({ text: "", an: false });
@@ -191,13 +189,12 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
   const ma = isFinite(maNum) && maNum > 0 ? Math.round(maNum) : null;
   const gutscheine = ma ? Math.max(1, Math.floor(ma / 3)) : null;
 
-  /* Teilnehmende aus dem Kontingent uebernehmen, solange nicht manuell gesetzt */
-  const tnWert = !tnManual && gutscheine !== null ? String(gutscheine) : f.tn;
 
   const c = useMemo(() => {
     const kosten = num(f.kosten, 0);
     const gehalt = num(f.gehalt, 0);
-    const tn = Math.max(1, Math.round(num(tnWert, 1)));
+    /* eine Teilnehmerzahl fuer alles: Gutscheine aus "Ihr Kontingent" (Folie 9) */
+    const tn = gutscheine ?? 1;
     const monate = num(f.monate, 0);
     const stunden = num(f.stunden, 0);
     const regel = num(f.regel, 160);
@@ -224,12 +221,10 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
       lohnProMonat: monate > 0 ? lohnFoerder / monate : 0,
       lohnProMonatGesamt: monate > 0 ? (lohnFoerder / monate) * tn : 0,
     };
-  }, [f.kosten, f.gehalt, f.monate, f.stunden, f.regel, tnWert, r]);
+  }, [f.kosten, f.gehalt, f.monate, f.stunden, f.regel, gutscheine, r]);
 
-  /* Anzahl Personen auf Folie "Ablauf": kommt aus "Ihr Kontingent" (Folie 9) und ist hier nicht editierbar; ohne
-     Mitarbeiterzahl gilt die Rechnung. Liste max. 15 Zeilen */
-  const personen = gutscheine ?? c.tn;
-  const tnAnzahl = Math.min(15, personen);
+  /* Teilnehmerliste auf Folie "Ablauf": max. 15 Zeilen */
+  const tnAnzahl = Math.min(15, c.tn);
   const kurseAuswahl = progs.length ? progs : Object.keys(ANGEBOTE);
 
   const setTnFeld = (i: number, key: keyof TnZeile, v: string) => {
@@ -293,7 +288,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     [bz.telefon, txt("telefon") || offen],
     [bz.mail, txt("mail") || offen],
     [bz.ma, ma !== null ? String(ma) : offen],
-    [bz.tn, String(personen)],
+    [bz.tn, String(c.tn)],
     [
       bz.kurs,
       gewaehlteAngebote.length
@@ -360,7 +355,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
           totalFunding: c.gesamt,
         }
       : null,
-    plannedParticipants: personen,
+    plannedParticipants: c.tn,
     participantList: Array.from({ length: tnAnzahl }, (_, i) => {
       const zeile = tnZeilen[i] ?? LEERE_ZEILE;
       return {
@@ -429,13 +424,23 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     setReq({ std: false, abschluss: false, sv: false });
     setProgs([]);
     setAngebote([]);
-    setTnManual(false);
     setTnZeilen([]);
     setF(START_FELDER);
     setSende("idle");
     setMeldung("");
     go(0);
   };
+
+  /* Teilnehmerzahl: nur auf "Ihr Kontingent" änderbar, sonst schreibgeschützt */
+  const tnFeld = (id: string, label: string) => (
+    <div className="field">
+      <label htmlFor={id}>{label}</label>
+      <input id={id} type="text" readOnly value={c.tn} aria-describedby={id + "Hinweis"} />
+      <button id={id + "Hinweis"} type="button" className="fhint fhint-link" onClick={() => go(SLIDES.indexOf("Ihr Kontingent"))}>
+        {gutscheine !== null ? t.tnHinweis : t.tnHinweisLeer}
+      </button>
+    </div>
+  );
 
   const slideCls = (id: SlideId) => "slide" + (SLIDES.indexOf(id) === idx ? " active" : "");
   const istLetzte = idx === SLIDES.length - 1;
@@ -847,27 +852,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                   <div className="grid-3">
                     <div className="field"><label htmlFor="inKosten">{t.ersparnis.kosten}</label><input id="inKosten" type="number" min={0} step={100} inputMode="numeric" {...feld("kosten")} /></div>
                     <div className="field"><label htmlFor="inGehalt">{t.ersparnis.gehalt}</label><input id="inGehalt" type="number" min={0} step={100} inputMode="numeric" {...feld("gehalt")} /></div>
-                    <div className="field">
-                      <label htmlFor="inTN">{t.ersparnis.tn}</label>
-                      <input
-                        id="inTN"
-                        type="number"
-                        min={1}
-                        step={1}
-                        inputMode="numeric"
-                        value={tnWert}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          setTnManual(true);
-                          setF((alt) => ({ ...alt, tn: v }));
-                        }}
-                      />
-                      {tnManual ? (
-                        <span className="fhint">{t.ersparnis.manuell}</span>
-                      ) : gutscheine !== null && ma !== null ? (
-                        <span className="fhint">{t.ersparnis.ausKontingent(ma)}</span>
-                      ) : null}
-                    </div>
+                    {tnFeld("inTN", t.ersparnis.tn)}
                     <div className="field"><label htmlFor="inMonate">{t.ersparnis.monate}</label><input id="inMonate" type="number" min={1} max={24} step={1} inputMode="numeric" {...feld("monate")} /></div>
                     <div className="field"><label htmlFor="inStunden">{t.ersparnis.stunden}</label><input id="inStunden" type="number" min={1} step={1} inputMode="numeric" {...feld("stunden")} /></div>
                     <div className="field"><label htmlFor="inRegel">{t.ersparnis.regel}</label><input id="inRegel" type="number" min={1} step={1} inputMode="numeric" {...feld("regel")} /></div>
@@ -909,26 +894,9 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                       </div>
                       <div className="card" id="tnKarte">
                         <h3>{t.ablauf.tnTitel}</h3>
-                        <p>{t.ablauf.tnText(personen)}</p>
+                        <p>{t.ablauf.tnText(c.tn)}</p>
                         <div style={{ marginTop: 14, maxWidth: 260 }}>
-                          <div className="field">
-                            <label htmlFor="stepAnzahl">{t.ablauf.anzahl}</label>
-                            <input
-                              id="stepAnzahl"
-                              type="text"
-                              readOnly
-                              value={personen}
-                              aria-describedby="stepAnzahlHinweis"
-                            />
-                            <button
-                              id="stepAnzahlHinweis"
-                              type="button"
-                              className="fhint fhint-link"
-                              onClick={() => go(SLIDES.indexOf("Ihr Kontingent"))}
-                            >
-                              {t.ablauf.anzahlHinweis}
-                            </button>
-                          </div>
+                          {tnFeld("stepAnzahl", t.ablauf.anzahl)}
                         </div>
                         <div className="tn-liste">
                           <div className="tn-kopf">

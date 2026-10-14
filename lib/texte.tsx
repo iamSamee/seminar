@@ -37,6 +37,8 @@ const de = {
   offen: "offen",
   nochOffen: "noch offen",
   terminIdeal: "Ideal am ",
+  tnHinweis: "aus „Ihr Kontingent“ — dort ändern",
+  tnHinweisLeer: "Mitarbeiterzahl unter „Ihr Kontingent“ eintragen",
   kopiertOk: "Nachricht kopiert — im Kontaktformular bei „Nachricht“ mit Strg + V einfügen.",
   kopiertFehler: "Kopieren war nicht möglich — bitte den Text auf der Folie markieren und mit Strg + C kopieren.",
   azavAlt: "GUTcert — Zulassung AZAV",
@@ -226,8 +228,6 @@ const de = {
     monate: "Dauer (Monate)",
     stunden: "Weiterbildung (Std./Monat)",
     regel: "Regelarbeitszeit (Std./Monat)",
-    manuell: "manuell gesetzt",
-    ausKontingent: (ma: number) => "übernommen aus Ihrem Kontingent (" + ma + " Mitarbeitende)",
     figGesamt: "Gesamtförderung über die volle Laufzeit",
     figEigen: "Eigenanteil an den Kurskosten",
     aufschluesselung: "So setzt sich die Förderung zusammen",
@@ -267,7 +267,6 @@ const de = {
     tnText: (n: number) =>
       "Nach Ihrer Rechnung sind das " + n + (n === 1 ? " Person" : " Personen") + ". Wer genau qualifiziert werden soll, brauchen wir für die Antragstellung.",
     anzahl: "Anzahl Personen",
-    anzahlHinweis: "aus „Ihr Kontingent“ — dort ändern",
     spalten: ["Vorname", "Name", "Weiterbildung", "Position heute"],
     positionPlatzhalter: "z. B. Innendienst",
     aria: {
@@ -434,6 +433,8 @@ const en: Texte = {
   offen: "open",
   nochOffen: "still open",
   terminIdeal: "Ideally on ",
+  tnHinweis: "from “Your quota” — change it there",
+  tnHinweisLeer: "enter your employees under “Your quota”",
   kopiertOk: "Message copied — paste it into the “Nachricht” (message) field of the contact form with Ctrl + V.",
   kopiertFehler: "Copying didn't work — please select the text on the slide and copy it with Ctrl + C.",
   azavAlt: "GUTcert — AZAV approval",
@@ -623,8 +624,6 @@ const en: Texte = {
     monate: "Duration (months)",
     stunden: "Training (hrs/month)",
     regel: "Regular working time (hrs/month)",
-    manuell: "set manually",
-    ausKontingent: (ma: number) => "taken from your quota (" + ma + " employees)",
     figGesamt: "Total funding over the full duration",
     figEigen: "Own contribution to course costs",
     aufschluesselung: "How the funding is made up",
@@ -664,7 +663,6 @@ const en: Texte = {
     tnText: (n: number) =>
       "Based on your calculation, that's " + n + (n === 1 ? " person" : " people") + ". We need to know exactly who will be trained for the application.",
     anzahl: "Number of people",
-    anzahlHinweis: "from “Your quota” — change it there",
     spalten: ["First name", "Last name", "Training", "Current position"],
     positionPlatzhalter: "e.g. Sales support",
     aria: {
