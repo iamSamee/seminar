@@ -134,8 +134,6 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
   const [progs, setProgs] = useState<string[]>([]);
   const [angebote, setAngebote] = useState<string[]>([]);
   const [tnManual, setTnManual] = useState(false);
-  const [anzManual, setAnzManual] = useState(false);
-  const [anzahl, setAnzahl] = useState("");
   const [tnZeilen, setTnZeilen] = useState<TnZeile[]>([]);
   const [f, setF] = useState<Felder>(START_FELDER);
   const [toast, setToast] = useState<{ text: string; an: boolean }>({ text: "", an: false });
@@ -228,13 +226,10 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     };
   }, [f.kosten, f.gehalt, f.monate, f.stunden, f.regel, tnWert, r]);
 
-  /* Anzahl Personen auf Folie "Ablauf": folgt der Rechnung, bis manuell gesetzt */
-  const anzahlWert = anzManual ? anzahl : String(c.tn);
-  let tnAnzahl = parseInt(anzahlWert, 10);
-  if (!isFinite(tnAnzahl) || tnAnzahl < 1) tnAnzahl = 1;
-  if (tnAnzahl > 15) tnAnzahl = 15;
+  /* Anzahl Personen auf Folie "Ablauf": kommt immer aus der Rechnung
+     ("Ihre Ersparnis") und ist dort nicht editierbar; Liste max. 15 Zeilen */
+  const tnAnzahl = Math.min(15, c.tn);
   const kurseAuswahl = progs.length ? progs : Object.keys(ANGEBOTE);
-  const anzahlN = parseInt(anzahlWert, 10);
 
   const setTnFeld = (i: number, key: keyof TnZeile, v: string) => {
     setTnZeilen((alt) => {
@@ -290,7 +285,6 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
   const offen = t.nochOffen;
   const bz = t.anfordern.zeilen;
   const anschrift = [txt("strasse"), [txt("plz"), txt("ort")].filter(Boolean).join(" ")].filter(Boolean).join(", ");
-  const geplanteTn = (anzManual && anzahl.trim()) || String(c.tn);
   const bereit: Row[] = [
     [bz.firma, firma || offen],
     [bz.anschrift, anschrift || offen],
@@ -298,7 +292,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     [bz.telefon, txt("telefon") || offen],
     [bz.mail, txt("mail") || offen],
     [bz.ma, ma !== null ? String(ma) : offen],
-    [bz.tn, geplanteTn],
+    [bz.tn, String(c.tn)],
     [
       bz.kurs,
       gewaehlteAngebote.length
@@ -337,8 +331,9 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
       postcode: txt("plz"),
       city: txt("ort"),
     },
-    priorExperience: exp,
-    companySize: size,
+    /* lesbare Bezeichnungen statt interner Kürzel wie "klein" oder "neu" */
+    priorExperience: exp ? t.vorerfahrung.label[exp] : null,
+    companySize: size ? t.quote.groessen[size] : null,
     courseFundingRate: r ? r.kurs : null,
     wageSubsidyRate: r ? r.lohn : null,
     requirements: { minHours20: req.std, qualification2Years: req.abschluss, socialInsurance: req.sv, met: reqCount },
@@ -364,7 +359,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
           totalFunding: c.gesamt,
         }
       : null,
-    plannedParticipants: parseInt(geplanteTn, 10) || c.tn,
+    plannedParticipants: c.tn,
     participantList: Array.from({ length: tnAnzahl }, (_, i) => {
       const zeile = tnZeilen[i] ?? LEERE_ZEILE;
       return {
@@ -434,8 +429,6 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     setProgs([]);
     setAngebote([]);
     setTnManual(false);
-    setAnzManual(false);
-    setAnzahl("");
     setTnZeilen([]);
     setF(START_FELDER);
     setSende("idle");
@@ -915,23 +908,25 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                       </div>
                       <div className="card" id="tnKarte">
                         <h3>{t.ablauf.tnTitel}</h3>
-                        <p>{isFinite(anzahlN) && anzahlN > 0 ? t.ablauf.tnText(anzahlN) : t.ablauf.tnTextLeer}</p>
+                        <p>{t.ablauf.tnText(c.tn)}</p>
                         <div style={{ marginTop: 14, maxWidth: 260 }}>
                           <div className="field">
                             <label htmlFor="stepAnzahl">{t.ablauf.anzahl}</label>
                             <input
                               id="stepAnzahl"
-                              type="number"
-                              min={1}
-                              max={15}
-                              step={1}
-                              inputMode="numeric"
-                              value={anzahlWert}
-                              onChange={(e) => {
-                                setAnzManual(true);
-                                setAnzahl(e.target.value);
-                              }}
+                              type="text"
+                              readOnly
+                              value={c.tn}
+                              aria-describedby="stepAnzahlHinweis"
                             />
+                            <button
+                              id="stepAnzahlHinweis"
+                              type="button"
+                              className="fhint fhint-link"
+                              onClick={() => go(SLIDES.indexOf("Ihre Ersparnis"))}
+                            >
+                              {t.ablauf.anzahlHinweis}
+                            </button>
                           </div>
                         </div>
                         <div className="tn-liste">

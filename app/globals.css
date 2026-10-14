@@ -223,6 +223,9 @@ a.toolbtn { text-decoration: none; }
 }
 .fhint { font-family: var(--mono); font-size: 10.5px; letter-spacing: .03em; color: var(--accent); }
 .field input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+.field input[readonly] { background: var(--panel-2); color: var(--ink-2); cursor: default; }
+.field input[readonly]:focus { border-color: var(--line-2); box-shadow: none; }
+.fhint-link { background: none; border: 0; padding: 0; text-align: left; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 
 .toggle {
   display: flex; align-items: center; gap: 12px; width: 100%;
