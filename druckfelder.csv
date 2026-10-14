@@ -1,0 +1,45 @@
+﻿Abschnitt,Feld,Quelle,Eingegeben auf Folie,Wert wenn leer
+Kopfzeile,Titel,fest,—,Zusammenfassung
+Kopfzeile,Unternehmen · Datum,Eingabe + Druckdatum,Ihre Angaben,nur Datum
+Agenda,Unternehmensgröße,Auswahl,Förderquote,noch offen
+Agenda,Fördersatz (Kurskosten · Lohnkosten),berechnet aus Unternehmensgröße,Förderquote,noch offen
+Agenda,Voraussetzungen,Auswahl (x von 3),Voraussetzungen,noch offen
+Agenda,Mögliche Gutscheine,berechnet (Mitarbeitende ÷ 3),Ihr Kontingent,noch offen
+Agenda,Gewählte Weiterbildungen,Auswahl,Weiterbildungen,noch offen
+Agenda,Geschätzte Förderung,berechnet,Ihre Ersparnis,noch offen
+Ihre Auswahl (je gewähltes Bildungsangebot),Titel,Auswahl,Ihre Angaben,Abschnitt bleibt leer
+Ihre Auswahl (je gewähltes Bildungsangebot),Beschreibung,Katalog,Ihre Angaben,—
+Ihre Auswahl (je gewähltes Bildungsangebot),UE · Maßn.-Nr. · DKZ,Katalog,Ihre Angaben,—
+Ihre Auswahl (je gewähltes Bildungsangebot),Links: Bildungsangebot / Kursseite,Katalog,Ihre Angaben,—
+Ihre Auswahl,Anbieter-Nr. (BA),fest,—,304731
+Erhebungsbogen anfordern,Telefon Arbeitgeber-Service,fest,—,0800 4 555520
+Erhebungsbogen anfordern,Kontaktformular Arbeitsagentur,fest,—,web.arbeitsagentur.de
+Erhebungsbogen anfordern,Unternehmen,Eingabe,Ihre Angaben,noch offen
+Erhebungsbogen anfordern,Anschrift (Straße · PLZ Ort),Eingabe,Ihre Angaben,noch offen
+Erhebungsbogen anfordern,Ansprechpartner (Rolle),Eingabe,Ihre Angaben,noch offen
+Erhebungsbogen anfordern,Telefon,Eingabe,Ihre Angaben,noch offen
+Erhebungsbogen anfordern,E-Mail,Eingabe,Ihre Angaben,noch offen
+Erhebungsbogen anfordern,Mitarbeitende,Eingabe,Ihr Kontingent,noch offen
+Erhebungsbogen anfordern,Vorgesehene Teilnehmende,Eingabe oder berechnet,Ablauf / Ihre Ersparnis,Wert aus der Rechnung (mind. 1)
+Erhebungsbogen anfordern,Weiterbildung (Titel + Maßn.-Nr.),Auswahl,Ihre Angaben,noch offen
+Erhebungsbogen anfordern,Bildungsträger,fest,—,Seminarkontor GmbH · Anbieter-Nr. 304731
+Erhebungsbogen anfordern,Nachricht für das Kontaktformular,fester Text,—,—
+Zusammenfassung,Unternehmen,Eingabe,Ihre Angaben,offen
+Zusammenfassung,Ansprechpartner (Rolle),Eingabe,Ihre Angaben,offen
+Zusammenfassung,Branche,Eingabe,Ihre Angaben,offen
+Zusammenfassung,Vorerfahrung mit Bildungsgutscheinen,Auswahl,Vorerfahrung,offen
+Zusammenfassung,Unternehmensgröße,Auswahl,Förderquote,offen
+Zusammenfassung,Fördersatz Weiterbildungskosten,berechnet,Förderquote,offen
+Zusammenfassung,Fördersatz Lohnkosten,berechnet,Förderquote,offen
+Zusammenfassung,Voraussetzungen geprüft,Auswahl (x von 3),Voraussetzungen,0 von 3
+Zusammenfassung,Mitarbeitende im Unternehmen,Eingabe,Ihr Kontingent,offen
+Zusammenfassung,Mögliche Bildungsgutscheine,berechnet,Ihr Kontingent,offen
+Zusammenfassung,Gewählte Weiterbildungen,Auswahl,Weiterbildungen,offen
+Zusammenfassung,Teilnehmende in der Rechnung,Eingabe oder berechnet,Ihre Ersparnis,1
+Zusammenfassung,Lohnkostenzuschuss je Monat und Teilnehmer,berechnet,Ihre Ersparnis,offen
+Zusammenfassung,Lohnkostenzuschuss je Monat gesamt,berechnet,Ihre Ersparnis,offen
+Zusammenfassung,Geschätzte Gesamtförderung,berechnet,Ihre Ersparnis,offen
+Zusammenfassung,Fahrplan (3 Schritte),fester Text,—,—
+Ihr Bildungsberater,Name · Firma,fest,—,Oscar Nobre · Seminarkontor GmbH
+Ihr Bildungsberater,Idealer Folgetermin,berechnet (heute + 5 Tage; Wochenende → Montag),—,—
+Ihr Bildungsberater,Termin-Link · Website · Adresse,fest,—,—

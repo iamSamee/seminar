@@ -1,0 +1,45 @@
+﻿Section,Field,Label on printout (German),Source,Entered on slide,Value if empty
+Header,Title,Zusammenfassung,fixed,—,Zusammenfassung
+Header,Company · Date,Unternehmen · Datum,input + print date,Ihre Angaben (Your details),date only
+Agenda,Company size,Unternehmensgröße,selection,Förderquote (Funding rate),noch offen (still open)
+Agenda,Funding rate (course costs · wage costs),Fördersatz,calculated from company size,Förderquote (Funding rate),noch offen (still open)
+Agenda,Eligibility requirements,Voraussetzungen,selection (x of 3),Voraussetzungen (Requirements),noch offen (still open)
+Agenda,Possible vouchers,Mögliche Gutscheine,calculated (employees ÷ 3),Ihr Kontingent (Your quota),noch offen (still open)
+Agenda,Selected training programmes,Gewählte Weiterbildungen,selection,Weiterbildungen (Training programmes),noch offen (still open)
+Agenda,Estimated funding,Geschätzte Förderung,calculated,Ihre Ersparnis (Your savings),noch offen (still open)
+Your selection (per selected course offer),Title,—,selection,Ihre Angaben (Your details),section stays empty
+Your selection (per selected course offer),Description,—,catalogue,Ihre Angaben (Your details),—
+Your selection (per selected course offer),Teaching units · Measure no. · DKZ code,UE · Maßn.-Nr. · DKZ,catalogue,Ihre Angaben (Your details),—
+Your selection (per selected course offer),Links: course offer / course page,Bildungsangebot öffnen · Kursseite,catalogue,Ihre Angaben (Your details),—
+Your selection,Provider no. (Federal Employment Agency),Anbieter-Nr. (BA),fixed,—,304731
+Request survey form,Employer Service phone,Telefonisch · gebührenfrei,fixed,—,0800 4 555520
+Request survey form,Employment Agency contact form,Kontaktformular,fixed,—,web.arbeitsagentur.de
+Request survey form,Company,Unternehmen,input,Ihre Angaben (Your details),noch offen (still open)
+Request survey form,Address (street · postcode city),Anschrift,input,Ihre Angaben (Your details),noch offen (still open)
+Request survey form,Contact person (role),Ansprechpartner,input,Ihre Angaben (Your details),noch offen (still open)
+Request survey form,Phone,Telefon,input,Ihre Angaben (Your details),noch offen (still open)
+Request survey form,Email,E-Mail,input,Ihre Angaben (Your details),noch offen (still open)
+Request survey form,Employees,Mitarbeitende,input,Ihr Kontingent (Your quota),noch offen (still open)
+Request survey form,Planned participants,Vorgesehene Teilnehmende,input or calculated,Ablauf / Ihre Ersparnis (Process / Your savings),value from calculation (min. 1)
+Request survey form,Training (title + measure no.),Weiterbildung,selection,Ihre Angaben (Your details),noch offen (still open)
+Request survey form,Training provider,Bildungsträger,fixed,—,Seminarkontor GmbH · Anbieter-Nr. 304731
+Request survey form,Message for the contact form,Nachricht für das Kontaktformular,fixed text,—,—
+Summary,Company,Unternehmen,input,Ihre Angaben (Your details),offen (open)
+Summary,Contact person (role),Ansprechpartner,input,Ihre Angaben (Your details),offen (open)
+Summary,Industry,Branche,input,Ihre Angaben (Your details),offen (open)
+Summary,Prior experience with education vouchers,Vorerfahrung mit Bildungsgutscheinen,selection,Vorerfahrung (Prior experience),offen (open)
+Summary,Company size,Unternehmensgröße,selection,Förderquote (Funding rate),offen (open)
+Summary,Funding rate for training costs,Fördersatz Weiterbildungskosten,calculated,Förderquote (Funding rate),offen (open)
+Summary,Funding rate for wage costs,Fördersatz Lohnkosten,calculated,Förderquote (Funding rate),offen (open)
+Summary,Requirements checked,Voraussetzungen geprüft,selection (x of 3),Voraussetzungen (Requirements),0 von 3 (0 of 3)
+Summary,Employees in the company,Mitarbeitende im Unternehmen,input,Ihr Kontingent (Your quota),offen (open)
+Summary,Possible education vouchers,Mögliche Bildungsgutscheine,calculated,Ihr Kontingent (Your quota),offen (open)
+Summary,Selected training programmes,Gewählte Weiterbildungen,selection,Weiterbildungen (Training programmes),offen (open)
+Summary,Participants in the calculation,Teilnehmende in der Rechnung,input or calculated,Ihre Ersparnis (Your savings),1
+Summary,Wage subsidy per month and participant,Lohnkostenzuschuss je Monat und Teilnehmer,calculated,Ihre Ersparnis (Your savings),offen (open)
+Summary,Wage subsidy per month in total,Lohnkostenzuschuss je Monat gesamt,calculated,Ihre Ersparnis (Your savings),offen (open)
+Summary,Estimated total funding,Geschätzte Gesamtförderung,calculated,Ihre Ersparnis (Your savings),offen (open)
+Summary,Roadmap (3 steps),So geht es jetzt konkret weiter,fixed text,—,—
+Your education advisor,Name · Company,Ihr Bildungsberater,fixed,—,Oscar Nobre · Seminarkontor GmbH
+Your education advisor,Ideal follow-up date,Ideal am …,calculated (today + 5 days; weekend → Monday),—,—
+Your education advisor,Booking link · Website · Address,Termin online buchen · www.seminarkontor.com,fixed,—,—
