@@ -267,7 +267,7 @@ const de = {
     tnText: (n: number) =>
       "Nach Ihrer Rechnung sind das " + n + (n === 1 ? " Person" : " Personen") + ". Wer genau qualifiziert werden soll, brauchen wir für die Antragstellung.",
     anzahl: "Anzahl Personen",
-    anzahlHinweis: "aus „Ihre Ersparnis“ — dort ändern",
+    anzahlHinweis: "aus „Ihr Kontingent“ — dort ändern",
     spalten: ["Vorname", "Name", "Weiterbildung", "Position heute"],
     positionPlatzhalter: "z. B. Innendienst",
     aria: {
@@ -664,7 +664,7 @@ const en: Texte = {
     tnText: (n: number) =>
       "Based on your calculation, that's " + n + (n === 1 ? " person" : " people") + ". We need to know exactly who will be trained for the application.",
     anzahl: "Number of people",
-    anzahlHinweis: "from “Your savings” — change it there",
+    anzahlHinweis: "from “Your quota” — change it there",
     spalten: ["First name", "Last name", "Training", "Current position"],
     positionPlatzhalter: "e.g. Sales support",
     aria: {

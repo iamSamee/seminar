@@ -226,9 +226,10 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     };
   }, [f.kosten, f.gehalt, f.monate, f.stunden, f.regel, tnWert, r]);
 
-  /* Anzahl Personen auf Folie "Ablauf": kommt immer aus der Rechnung
-     ("Ihre Ersparnis") und ist dort nicht editierbar; Liste max. 15 Zeilen */
-  const tnAnzahl = Math.min(15, c.tn);
+  /* Anzahl Personen auf Folie "Ablauf": kommt aus "Ihr Kontingent" (Folie 9) und ist hier nicht editierbar; ohne
+     Mitarbeiterzahl gilt die Rechnung. Liste max. 15 Zeilen */
+  const personen = gutscheine ?? c.tn;
+  const tnAnzahl = Math.min(15, personen);
   const kurseAuswahl = progs.length ? progs : Object.keys(ANGEBOTE);
 
   const setTnFeld = (i: number, key: keyof TnZeile, v: string) => {
@@ -292,7 +293,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     [bz.telefon, txt("telefon") || offen],
     [bz.mail, txt("mail") || offen],
     [bz.ma, ma !== null ? String(ma) : offen],
-    [bz.tn, String(c.tn)],
+    [bz.tn, String(personen)],
     [
       bz.kurs,
       gewaehlteAngebote.length
@@ -359,7 +360,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
           totalFunding: c.gesamt,
         }
       : null,
-    plannedParticipants: c.tn,
+    plannedParticipants: personen,
     participantList: Array.from({ length: tnAnzahl }, (_, i) => {
       const zeile = tnZeilen[i] ?? LEERE_ZEILE;
       return {
@@ -908,7 +909,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                       </div>
                       <div className="card" id="tnKarte">
                         <h3>{t.ablauf.tnTitel}</h3>
-                        <p>{t.ablauf.tnText(c.tn)}</p>
+                        <p>{t.ablauf.tnText(personen)}</p>
                         <div style={{ marginTop: 14, maxWidth: 260 }}>
                           <div className="field">
                             <label htmlFor="stepAnzahl">{t.ablauf.anzahl}</label>
@@ -916,14 +917,14 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                               id="stepAnzahl"
                               type="text"
                               readOnly
-                              value={c.tn}
+                              value={personen}
                               aria-describedby="stepAnzahlHinweis"
                             />
                             <button
                               id="stepAnzahlHinweis"
                               type="button"
                               className="fhint fhint-link"
-                              onClick={() => go(SLIDES.indexOf("Ihre Ersparnis"))}
+                              onClick={() => go(SLIDES.indexOf("Ihr Kontingent"))}
                             >
                               {t.ablauf.anzahlHinweis}
                             </button>
