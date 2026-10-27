@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { anCsvAnhaengen } from "@/lib/speicher";
+import { anCsvAnhaengen, csvAktiv } from "@/lib/speicher";
 import { csvHeader, csvRow, flatten, isSubmission } from "@/lib/submission";
 
 export const runtime = "nodejs";
@@ -24,13 +24,15 @@ export async function POST(req: Request) {
   const zeile = csvRow(daten);
 
   const [csv, webhook] = await Promise.all([
-    anCsvAnhaengen(zeile).then(
-      () => true,
-      (e) => {
-        console.error("[submit] CSV konnte nicht geschrieben werden:", e);
-        return false;
-      }
-    ),
+    csvAktiv()
+      ? anCsvAnhaengen(zeile).then(
+          () => true,
+          (e) => {
+            console.error("[submit] CSV konnte nicht geschrieben werden:", e);
+            return false;
+          }
+        )
+      : false,
     process.env.WEBHOOK_URL
       ? fetch(process.env.WEBHOOK_URL, {
           method: "POST",
@@ -57,7 +59,7 @@ export async function POST(req: Request) {
       : null,
   ]);
 
-  if (webhook === null) console.warn("[submit] WEBHOOK_URL ist nicht gesetzt — nur CSV gespeichert.");
+  if (webhook === null) console.warn("[submit] WEBHOOK_URL ist nicht gesetzt.");
 
   /* Erfolgreich, sobald die Einsendung mindestens an einer Stelle gespeichert ist */
   const ok = csv || webhook === true;
