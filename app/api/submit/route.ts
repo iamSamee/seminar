@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { anCsvAnhaengen } from "@/lib/speicher";
-import { csvRow, flatten, isSubmission } from "@/lib/submission";
+import { csvHeader, csvRow, flatten, isSubmission } from "@/lib/submission";
 
 export const runtime = "nodejs";
 
@@ -35,7 +35,14 @@ export async function POST(req: Request) {
       ? fetch(process.env.WEBHOOK_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ event: "form_submission", ...daten, flat: flatten(daten) }),
+          body: JSON.stringify({
+            event: "form_submission",
+            ...daten,
+            flat: flatten(daten),
+            /* fertige CSV (Kopfzeile + Datenzeile) und Dateiname für den Empfänger */
+            csv: csvHeader() + "\r\n" + zeile + "\r\n",
+            csvFilename: "submission-" + daten.submittedAt.replace(/[:.]/g, "-") + ".csv",
+          }),
           signal: AbortSignal.timeout(10_000),
         }).then(
           (r) => {
