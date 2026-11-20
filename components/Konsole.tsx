@@ -8,7 +8,6 @@ import {
   BILDER,
   FORMULAR_TEXT,
   FORMULAR_URL,
-  KALENDER_URL,
   KUNDENSTIMMEN,
   PROGRAMME,
   RATES,
@@ -18,8 +17,9 @@ import {
   type SlideId,
   type Size,
 } from "@/lib/data";
+import type { BeraterOeffentlich } from "@/lib/berater";
 import { csvHeader, csvRow, type Submission } from "@/lib/submission";
-import { TEXTE, type Lang } from "@/lib/texte";
+import { TEXTE as t } from "@/lib/texte";
 
 /* ---------- Hilfsfunktionen ---------- */
 const num = (v: string, fallback: number) => {
@@ -37,6 +37,7 @@ const LEERE_ZEILE: TnZeile = { vorname: "", name: "", kurs: "", position: "" };
 
 const START_FELDER = {
   ma: "",
+  bgs: "",
   kosten: "9000",
   gehalt: "3500",
   monate: "6",
@@ -55,6 +56,20 @@ const START_FELDER = {
 type Felder = typeof START_FELDER;
 type Angabe = "firma" | "name" | "rolle" | "branche" | "mail" | "telefon" | "strasse" | "plz" | "ort";
 const PFLICHT: Angabe[] = ["firma", "name", "mail"];
+
+/* Faustregel: 1 Bildungsgutschein je 5 Vollzeit-Mitarbeitende, mindestens 1 */
+const bgsVorschlag = (ma: number) => Math.max(1, Math.floor(ma / 5));
+
+/* Kurskosten (Durchschnitt) und Dauer (längste Maßnahme, Wochen -> Monate)
+   der gewählten Programme — Vorbelegung für "Ihre Ersparnis" */
+function ausProgrammen(progs: string[]) {
+  const liste = progs.map((p) => ANGEBOTE[p]?.[0]).filter((a): a is Angebot => !!a);
+  if (!liste.length) return null;
+  return {
+    kosten: String(Math.round(liste.reduce((s, a) => s + a.preis, 0) / liste.length)),
+    monate: String(Math.max(...liste.map((a) => Math.round((a.wochen * 12) / 52)))),
+  };
+}
 
 /* Zwischenablage: moderne Schnittstelle, sonst klassischer Weg */
 function kopiere(text: string): Promise<boolean> {
@@ -107,9 +122,7 @@ function PlanItem({ k, v, filled, money }: { k: string; v: string; filled: boole
   );
 }
 
-export default function Konsole({ lang = "de" }: { lang?: Lang }) {
-  const t = TEXTE[lang];
-
+export default function Konsole({ berater }: { berater: BeraterOeffentlich }) {
   /* ---------- Formatierung je Sprache ---------- */
   const eur = (n: number) =>
     new Intl.NumberFormat(t.locale, { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
@@ -121,9 +134,6 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
       maximumFractionDigits: 2,
     }).format(n);
   const pct = (n: number) => Math.round(n * 100) + t.pctSuffix;
-  const progName = (prog: string) => (lang === "en" ? PROGRAMME.find((p) => p.prog === prog)?.en.name ?? prog : prog);
-  const angTitel = (a: Angebot) => (lang === "en" ? a.titelEn : a.titel);
-  const angText = (a: Angebot) => (lang === "en" ? a.textEn : a.text);
 
   /* ---------- Zustand ---------- */
   const [idx, setIdx] = useState(0);
@@ -138,11 +148,17 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
   const [druckDatum, setDruckDatum] = useState("");
   const [termin, setTermin] = useState<{ anzeige: string; href: string; iso: string }>({
     anzeige: t.terminIdeal + "…",
-    href: KALENDER_URL,
+    href: berater.kalender,
     iso: "",
   });
   const [sende, setSende] = useState<Sendestatus>("idle");
   const [meldung, setMeldung] = useState("");
+  /* von Hand geänderte Felder werden nicht mehr automatisch vorbelegt */
+  const [manuell, setManuell] = useState<{ bgs: boolean; kosten: boolean; monate: boolean }>({
+    bgs: false,
+    kosten: false,
+    monate: false,
+  });
 
   const stageRef = useRef<HTMLElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -151,6 +167,14 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     value: f[key],
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
       const v = e.target.value;
+      if (key === "ma") {
+        /* Gutscheine folgen der Mitarbeiterzahl, solange sie nicht von Hand geändert wurden */
+        const n = parseFloat(v);
+        const vorschlag = isFinite(n) && n > 0 ? String(bgsVorschlag(Math.round(n))) : "";
+        setF((alt) => ({ ...alt, ma: v, ...(manuell.bgs ? {} : { bgs: vorschlag }) }));
+        return;
+      }
+      if (key === "bgs" || key === "kosten" || key === "monate") setManuell((alt) => ({ ...alt, [key]: true }));
       setF((alt) => ({ ...alt, [key]: v }));
     },
   });
@@ -161,10 +185,6 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     setIdx(Math.max(0, Math.min(SLIDES.length - 1, i)));
     if (stageRef.current) stageRef.current.scrollTop = 0;
   };
-
-  useEffect(() => {
-    document.documentElement.lang = lang;
-  }, [lang]);
 
   /* ---------- Idealer Folgetermin: 5 Tage nach der Beratung ---------- */
   useEffect(() => {
@@ -178,8 +198,8 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     const iso = d.getFullYear() + "-" + zwei(d.getMonth() + 1) + "-" + zwei(d.getDate());
     /* Calendly oeffnet damit direkt den Monat/Tag */
     setDruckDatum(new Date().toLocaleDateString(t.locale, { day: "2-digit", month: "long", year: "numeric" }));
-    setTermin({ anzeige: t.terminIdeal + anzeige, href: KALENDER_URL + "?month=" + iso.slice(0, 7) + "&date=" + iso, iso });
-  }, [t.locale, t.terminIdeal]);
+    setTermin({ anzeige: t.terminIdeal + anzeige, href: berater.kalender + "?month=" + iso.slice(0, 7) + "&date=" + iso, iso });
+  }, [berater.kalender]);
 
   /* ---------- Abgeleitete Werte ---------- */
   const r = size ? RATES[size] : null;
@@ -187,7 +207,9 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
 
   const maNum = parseFloat(f.ma);
   const ma = isFinite(maNum) && maNum > 0 ? Math.round(maNum) : null;
-  const gutscheine = ma ? Math.max(1, Math.floor(ma / 3)) : null;
+  const vorschlag = ma ? bgsVorschlag(ma) : null;
+  const bgsNum = parseFloat(f.bgs);
+  const gutscheine = isFinite(bgsNum) && bgsNum > 0 ? Math.round(bgsNum) : null;
 
 
   const c = useMemo(() => {
@@ -236,6 +258,19 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     });
   };
 
+  const waehleProgramm = (prog: string) => {
+    const neu = progs.includes(prog) ? progs.filter((x) => x !== prog) : [...progs, prog];
+    setProgs(neu);
+    const werte = ausProgrammen(neu);
+    if (werte)
+      setF((alt) => ({
+        ...alt,
+        ...(manuell.kosten ? {} : { kosten: werte.kosten }),
+        ...(manuell.monate ? {} : { monate: werte.monate }),
+      }));
+  };
+  const kostenAusProgramm = !manuell.kosten && progs.length > 0;
+
   const gewaehlteAngebote = Object.values(ANGEBOTE)
     .flat()
     .filter((a) => angebote.includes(a.nr));
@@ -271,7 +306,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     [sz.req, sz.reqWert(reqCount)],
     [sz.ma, ma !== null ? String(ma) : t.offen],
     [sz.gutscheine, gutscheine !== null ? String(gutscheine) : t.offen],
-    [sz.progs, progs.length ? progs.map(progName).join(", ") : t.offen],
+    [sz.progs, progs.length ? progs.join(", ") : t.offen],
     [sz.tn, String(c.tn)],
     [sz.lohnMonatTn, r ? eur(c.lohnProMonat) : t.offen],
     [sz.lohnMonat, r ? eur(c.lohnProMonatGesamt) : t.offen],
@@ -292,7 +327,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     [
       bz.kurs,
       gewaehlteAngebote.length
-        ? gewaehlteAngebote.map((a) => angTitel(a) + " (" + t.angaben.massnNr + " " + a.nr + ")").join(", ")
+        ? gewaehlteAngebote.map((a) => a.titel + " (" + t.angaben.massnNr + " " + a.nr + ")").join(", ")
         : offen,
     ],
     [bz.traeger, "Seminarkontor GmbH · " + t.angaben.anbieterNr + " " + ANBIETER_NR],
@@ -311,11 +346,11 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
   const nachrichtKopieren = () =>
     kopiere(FORMULAR_TEXT).then((ok) => zeigeHinweis(ok ? t.kopiertOk : t.kopiertFehler));
 
-  /* Datensatz fuer Webhook und CSV — Programme und Massnahmen mit ihren
-     amtlichen (deutschen) Bezeichnungen, unabhaengig von der Sprache */
+  /* Datensatz fuer Webhook, E-Mail und CSV */
   const baueSubmission = (): Submission => ({
     submittedAt: new Date().toISOString(),
-    language: lang,
+    language: "de",
+    advisor: berater.id,
     contact: {
       company: firma,
       name: person,
@@ -335,6 +370,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     requirements: { minHours20: req.std, qualification2Years: req.abschluss, socialInsurance: req.sv, met: reqCount },
     employees: ma,
     possibleVouchers: gutscheine,
+    suggestedVouchers: vorschlag,
     programmes: progs,
     offers: gewaehlteAngebote.map((a) => ({ measureNo: a.nr, title: a.titel, teachingUnits: a.ue, dkz: a.dkz })),
     calculation: r
@@ -375,7 +411,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     const a = document.createElement("a");
     const name = (firma || "angaben").toLowerCase().replace(/[^a-z0-9äöüß]+/gi, "-").replace(/^-|-$/g, "");
     a.href = url;
-    a.download = (lang === "en" ? "funding-plan-" : "foerderplan-") + name + "-" + daten.submittedAt.slice(0, 10) + ".csv";
+    a.download = "foerderplan-" + name + "-" + daten.submittedAt.slice(0, 10) + ".csv";
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -426,6 +462,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
     setAngebote([]);
     setTnZeilen([]);
     setF(START_FELDER);
+    setManuell({ bgs: false, kosten: false, monate: false });
     setSende("idle");
     setMeldung("");
     go(0);
@@ -468,9 +505,6 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
               />
             ))}
           </nav>
-          <a className="toolbtn" href={t.wechsel.href} aria-label={t.wechsel.aria} hrefLang={lang === "de" ? "en" : "de"}>
-            {t.wechsel.label}
-          </a>
           <button className="toolbtn" type="button" onClick={reset}>
             {t.reset}
           </button>
@@ -772,6 +806,26 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                         <label htmlFor="inMA">{t.kontingent.maLabel}</label>
                         <input id="inMA" type="number" min={1} max={100000} step={1} placeholder={t.kontingent.maPlatzhalter} inputMode="numeric" {...feld("ma")} />
                       </div>
+                      <div className="field" style={{ marginTop: 10 }}>
+                        <label htmlFor="inBGS">{t.kontingent.bgsLabel}</label>
+                        <input id="inBGS" type="number" min={1} max={100000} step={1} inputMode="numeric" aria-describedby="bgsHinweis" {...feld("bgs")} />
+                        {vorschlag !== null &&
+                          (gutscheine !== vorschlag ? (
+                            <button
+                              id="bgsHinweis"
+                              type="button"
+                              className="fhint fhint-link"
+                              onClick={() => {
+                                setF((alt) => ({ ...alt, bgs: String(vorschlag) }));
+                                setManuell((alt) => ({ ...alt, bgs: false }));
+                              }}
+                            >
+                              {t.kontingent.bgsUebernehmen(vorschlag)}
+                            </button>
+                          ) : (
+                            <span id="bgsHinweis" className="fhint">{t.kontingent.bgsVorschlag(vorschlag)}</span>
+                          ))}
+                      </div>
                     </div>
                     <div className="fig" style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
                       <span className="v">{gutscheine !== null ? String(gutscheine) : "—"}</span>
@@ -794,26 +848,23 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                 </div>
                 <div className="stack">
                   <div className="prog">
-                    {PROGRAMME.map((p) => {
-                      const anz = lang === "en" ? p.en : p;
-                      return (
-                        <div className="prog-item" key={p.prog}>
-                          <button
-                            type="button"
-                            className="prog-card"
-                            aria-pressed={progs.includes(p.prog)}
-                            onClick={() => toggleList(progs, setProgs, p.prog)}
-                          >
-                            <span className="pc-t">{anz.titel}</span>
-                            <span className="pc-d">{anz.text}</span>
-                            <span className="pc-ue">{anz.ue}</span>
-                          </button>
-                          <a className="prog-link" href={p.url} target="_blank" rel="noopener noreferrer">
-                            {p.url.replace("https://", "").replace(/\/$/, "")} ↗
-                          </a>
-                        </div>
-                      );
-                    })}
+                    {PROGRAMME.map((p) => (
+                      <div className="prog-item" key={p.prog}>
+                        <button
+                          type="button"
+                          className="prog-card"
+                          aria-pressed={progs.includes(p.prog)}
+                          onClick={() => waehleProgramm(p.prog)}
+                        >
+                          <span className="pc-t">{p.titel}</span>
+                          <span className="pc-d">{p.text}</span>
+                          <span className="pc-ue">{p.ue}</span>
+                        </button>
+                        <a className="prog-link" href={p.url} target="_blank" rel="noopener noreferrer">
+                          {p.url.replace("https://", "").replace(/\/$/, "")} ↗
+                        </a>
+                      </div>
+                    ))}
                     <div className="seals">
                       <div className="seal">
                         <span className="seal-plate">
@@ -850,7 +901,11 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                 </div>
                 <div className="stack">
                   <div className="grid-3">
-                    <div className="field"><label htmlFor="inKosten">{t.ersparnis.kosten}</label><input id="inKosten" type="number" min={0} step={100} inputMode="numeric" {...feld("kosten")} /></div>
+                    <div className="field">
+                      <label htmlFor="inKosten">{t.ersparnis.kosten}</label>
+                      <input id="inKosten" type="number" min={0} step={100} inputMode="numeric" aria-describedby={kostenAusProgramm ? "kostenHinweis" : undefined} {...feld("kosten")} />
+                      {kostenAusProgramm && <span id="kostenHinweis" className="fhint">{t.ersparnis.kostenHinweis}</span>}
+                    </div>
                     <div className="field"><label htmlFor="inGehalt">{t.ersparnis.gehalt}</label><input id="inGehalt" type="number" min={0} step={100} inputMode="numeric" {...feld("gehalt")} /></div>
                     {tnFeld("inTN", t.ersparnis.tn)}
                     <div className="field"><label htmlFor="inMonate">{t.ersparnis.monate}</label><input id="inMonate" type="number" min={1} max={24} step={1} inputMode="numeric" {...feld("monate")} /></div>
@@ -888,7 +943,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                         <h3>{t.ablauf.todoTitel}</h3>
                         <ul className="bullets" style={{ marginTop: 12 }}>
                           {t.ablauf.todo.map((x, i) => (
-                            <li key={i}><span className="tick">{i + 1}</span><span>{x}</span></li>
+                            <li key={i}><span className="tick">{i + 1}</span><span>{x(berater.name)}</span></li>
                           ))}
                         </ul>
                       </div>
@@ -914,7 +969,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                                 <select aria-label={t.ablauf.aria.kurs(i + 1)} value={kurs} onChange={(e) => setTnFeld(i, "kurs", e.target.value)}>
                                   <option value="">{t.nochOffen}</option>
                                   {kurseAuswahl.map((k) => (
-                                    <option key={k} value={k}>{progName(k)}</option>
+                                    <option key={k} value={k}>{k}</option>
                                   ))}
                                 </select>
                                 <input type="text" aria-label={t.ablauf.aria.position(i + 1)} placeholder={t.ablauf.positionPlatzhalter} value={zeile.position} onChange={(e) => setTnFeld(i, "position", e.target.value)} />
@@ -987,13 +1042,13 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                         <div className="ang-auswahl">
                           {gewaehlteAngebote.map((a) => (
                             <div className="ang-detail" key={a.nr}>
-                              <b className="ang-dtitel">{angTitel(a)}</b>
-                              <p className="ang-text">{angText(a)}</p>
+                              <b className="ang-dtitel">{a.titel}</b>
+                              <p className="ang-text">{a.text}</p>
                               <p className="ang-doc">
                                 <a href={ANGEBOTE_URL} title={a.pdf} target="_blank" rel="noopener noreferrer">{t.angaben.angebotOeffnen}</a>
                                 {" · "}
                                 <a href={a.web} target="_blank" rel="noopener noreferrer">{t.angaben.kursseite}</a>
-                                <span className="ang-zul">{a.ue} {t.angaben.ue} · {t.angaben.massnNr} {a.nr} · DKZ {a.dkz}</span>
+                                <span className="ang-zul">{a.ue} {t.angaben.ue} · {a.wochen} {t.angaben.wochen} · {eur(a.preis)} {t.angaben.jeTn} · {t.angaben.massnNr} {a.nr} · DKZ {a.dkz}</span>
                               </p>
                             </div>
                           ))}
@@ -1024,8 +1079,8 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                                   >
                                     <span className="ang-box">✓</span>
                                     <span className="ang-kopf">
-                                      <b>{angTitel(a)}</b>
-                                      <span className="ang-meta">{a.ue} {t.angaben.ue} · {t.angaben.massnNr} {a.nr}</span>
+                                      <b>{a.titel}</b>
+                                      <span className="ang-meta">{a.ue} {t.angaben.ue} · {a.wochen} {t.angaben.wochen} · {eur(a.preis)} · {t.angaben.massnNr} {a.nr}</span>
                                     </span>
                                     {!an && progs.includes(prog) && <span className="ang-tag">{t.angaben.vorschlag}</span>}
                                   </button>
@@ -1142,10 +1197,12 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                       <div className="card" id="beraterKarte">
                         <h3>{t.zusammenfassung.beraterTitel}</h3>
                         <div className="kontakt-foto">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={BILDER.oscar} alt="Oscar Nobre" />
+                          {berater.foto && (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={berater.foto} alt={berater.name} />
+                          )}
                           <div className="contact">
-                            <span><strong>Oscar Nobre</strong> · Seminarkontor GmbH</span>
+                            <span><strong>{berater.name}</strong> · Seminarkontor GmbH</span>
                             <span className="termin-ideal"><b>{termin.anzeige}</b></span>
                             <a className="termin-btn" href={termin.href} target="_blank" rel="noopener noreferrer">{t.zusammenfassung.buchen}</a>
                             <a href="https://www.seminarkontor.com" target="_blank" rel="noopener noreferrer">www.seminarkontor.com</a>
@@ -1185,7 +1242,7 @@ export default function Konsole({ lang = "de" }: { lang?: Lang }) {
                 v={gutscheine !== null && ma !== null ? t.agenda.gutscheineWert(gutscheine, ma) : t.nochOffen}
                 filled={gutscheine !== null}
               />
-              <PlanItem k={t.agenda.progs} v={progs.length ? progs.map(progName).join(" · ") : t.nochOffen} filled={progs.length > 0} />
+              <PlanItem k={t.agenda.progs} v={progs.length ? progs.join(" · ") : t.nochOffen} filled={progs.length > 0} />
               <PlanItem k={t.agenda.foerderung} v={r ? eur(c.gesamt) : t.nochOffen} filled={!!r} money />
             </div>
           </aside>

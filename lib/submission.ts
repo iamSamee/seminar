@@ -7,7 +7,9 @@ export type GewaehltesAngebot = { measureNo: string; title: string; teachingUnit
 
 export type Submission = {
   submittedAt: string;
-  language: "de" | "en";
+  language: "de";
+  /* ID des Bildungsberaters aus dem Link (?berater=…) — der Server ordnet die E-Mail zu */
+  advisor: string;
   contact: {
     company: string;
     name: string;
@@ -26,6 +28,8 @@ export type Submission = {
   requirements: { minHours20: boolean; qualification2Years: boolean; socialInsurance: boolean; met: number };
   employees: number | null;
   possibleVouchers: number | null;
+  /* Vorschlag nach Faustregel (1 je 5 Vollzeit-MA); possibleVouchers ist der ggf. angepasste Wert */
+  suggestedVouchers: number | null;
   programmes: string[];
   offers: GewaehltesAngebot[];
   calculation: {
@@ -92,6 +96,8 @@ export const CSV_COLUMNS = [
   "planned_participants",
   "participant_list",
   "suggested_follow_up",
+  "vouchers_suggested",
+  "advisor",
 ] as const;
 
 type Spalte = (typeof CSV_COLUMNS)[number];
@@ -145,6 +151,8 @@ export function flatten(s: Submission): Record<Spalte, Wert> {
       .map((t) => [t.firstName, t.lastName].filter(Boolean).join(" ") + " (" + [t.programme, t.position].filter(Boolean).join(", ") + ")")
       .join(" | "),
     suggested_follow_up: s.suggestedFollowUp,
+    vouchers_suggested: s.suggestedVouchers,
+    advisor: s.advisor,
   };
 }
 
@@ -168,7 +176,8 @@ export function isSubmission(x: unknown): x is Submission {
   if (!x || typeof x !== "object") return false;
   const s = x as Partial<Submission>;
   return (
-    (s.language === "de" || s.language === "en") &&
+    s.language === "de" &&
+    typeof s.advisor === "string" &&
     typeof s.contact === "object" &&
     s.contact !== null &&
     typeof s.contact.company === "string" &&

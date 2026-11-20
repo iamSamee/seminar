@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { findeBerater } from "@/lib/berater";
+import { leadMailSenden } from "@/lib/mail";
 import { anCsvAnhaengen, csvAktiv } from "@/lib/speicher";
 import { csvHeader, csvRow, flatten, isSubmission } from "@/lib/submission";
 
@@ -6,7 +8,8 @@ export const runtime = "nodejs";
 
 /* Konfiguration über Umgebungsvariablen (siehe .env.example):
    WEBHOOK_URL           Ziel für den JSON-POST (z. B. Make, Zapier, n8n)
-   SUBMISSIONS_CSV_PATH  CSV-Datei, an die jede Einsendung angehängt wird */
+   SUBMISSIONS_CSV_PATH  CSV-Datei, an die jede Einsendung angehängt wird
+   GRAPH_* / SMTP_*      E-Mail an den zuständigen Berater (lib/mail.ts) */
 const MAX_BYTES = 100_000;
 
 export async function POST(req: Request) {
@@ -21,9 +24,16 @@ export async function POST(req: Request) {
   }
   if (!isSubmission(daten)) return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
 
-  const zeile = csvRow(daten);
+  /* Berater immer serverseitig aus der Liste bestimmen — nie eine
+     E-Mail-Adresse aus dem Browser übernehmen */
+  const berater = findeBerater(daten.advisor);
+  daten.advisor = berater.id;
 
-  const [csv, webhook] = await Promise.all([
+  const zeile = csvRow(daten);
+  const csvDatei = csvHeader() + "\r\n" + zeile + "\r\n";
+  const csvName = "submission-" + daten.submittedAt.replace(/[:.]/g, "-") + ".csv";
+
+  const [csv, webhook, mail] = await Promise.all([
     csvAktiv()
       ? anCsvAnhaengen(zeile).then(
           () => true,
@@ -42,8 +52,8 @@ export async function POST(req: Request) {
             ...daten,
             flat: flatten(daten),
             /* fertige CSV (Kopfzeile + Datenzeile) und Dateiname für den Empfänger */
-            csv: csvHeader() + "\r\n" + zeile + "\r\n",
-            csvFilename: "submission-" + daten.submittedAt.replace(/[:.]/g, "-") + ".csv",
+            csv: csvDatei,
+            csvFilename: csvName,
           }),
           signal: AbortSignal.timeout(10_000),
         }).then(
@@ -57,11 +67,14 @@ export async function POST(req: Request) {
           }
         )
       : null,
+    /* BOM, damit Excel den Anhang mit Umlauten korrekt öffnet */
+    leadMailSenden(daten, berater, "\uFEFF" + csvDatei, csvName),
   ]);
 
   if (webhook === null) console.warn("[submit] WEBHOOK_URL ist nicht gesetzt.");
+  if (mail === null) console.warn("[submit] Kein E-Mail-Versand konfiguriert (GRAPH_* oder SMTP_* fehlt).");
 
   /* Erfolgreich, sobald die Einsendung mindestens an einer Stelle gespeichert ist */
-  const ok = csv || webhook === true;
-  return NextResponse.json({ ok, csv, webhook }, { status: ok ? 200 : 502 });
+  const ok = csv || webhook === true || mail === true;
+  return NextResponse.json({ ok, csv, webhook, mail }, { status: ok ? 200 : 502 });
 }
