@@ -1,0 +1,100 @@
+/* Admin-Bereich — nutzt die Farb-Tokens aus globals.css (inkl. Dark Mode) */
+.adm { max-width: 1240px; margin: 0 auto; padding: 24px 16px 110px; font-size: 15px; }
+.adm code { font-family: var(--mono); font-size: .9em; background: var(--panel-2); padding: 1px 5px; border-radius: 4px; }
+
+.adm-kopf { display: flex; gap: 16px; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; margin-bottom: 18px; }
+.adm-kopf h1 { font-size: 24px; margin-bottom: 6px; }
+.adm-kopf p { color: var(--ink-2); max-width: 680px; }
+.adm-kopf-aktionen { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.adm-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 16px; border-radius: 8px; border: 1px solid var(--line-2);
+  background: var(--panel); color: var(--ink); font: inherit; font-weight: 600;
+  cursor: pointer; text-decoration: none; white-space: nowrap;
+}
+.adm-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.adm-btn:disabled { opacity: .45; cursor: default; }
+.adm-btn.primaer { background: var(--accent); border-color: var(--accent); color: #fff; }
+.adm-btn.primaer:hover:not(:disabled) { background: var(--accent-2); color: #fff; }
+.adm-btn.klein { padding: 6px 12px; font-size: 13.5px; }
+.adm-link { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+
+.adm-suche { position: sticky; top: 0; z-index: 2; background: var(--paper); padding: 8px 0 12px; }
+.adm-suche input {
+  width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--line-2);
+  background: var(--panel); color: var(--ink); font: inherit;
+}
+.adm-suche input:focus, .adm-feld textarea:focus, .adm-karte input:focus {
+  border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.adm-raster { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+@media (max-width: 900px) { .adm-raster { grid-template-columns: 1fr; } }
+
+.adm-gruppe { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; }
+.adm-gruppe > summary {
+  cursor: pointer; padding: 14px 18px; font-weight: 650; display: flex; gap: 10px; align-items: center;
+  list-style: none;
+}
+.adm-gruppe > summary::-webkit-details-marker { display: none; }
+.adm-gruppe > summary::before { content: "▸"; color: var(--muted); transition: transform .15s; }
+.adm-gruppe[open] > summary::before { transform: rotate(90deg); }
+.adm-gruppe[open] > summary { border-bottom: 1px solid var(--line); }
+.adm-badge { font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 999px; }
+
+.adm-feld { padding: 12px 18px; border-left: 3px solid transparent; }
+.adm-feld + .adm-feld { border-top: 1px solid var(--line); }
+.adm-feld.geaendert { border-left-color: var(--accent); }
+.adm-feld label { display: block; font-size: 12.5px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+.adm-feld textarea {
+  width: 100%; resize: vertical; padding: 9px 11px; border-radius: 8px; border: 1px solid var(--line-2);
+  background: var(--paper); color: var(--ink); font: inherit; line-height: 1.5;
+}
+.adm-feld-fuss { display: flex; gap: 12px; justify-content: space-between; flex-wrap: wrap; margin-top: 4px; font-size: 12.5px; color: var(--muted); font-family: var(--mono); }
+.adm-feld-fuss .adm-link { font-family: var(--sans); margin-left: auto; }
+.adm-warn { color: #b3261e; font-weight: 600; }
+
+.adm-bilder { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; padding: 16px 18px 6px; }
+.adm-bild { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; font-size: 14px; }
+.adm-bild-vorschau {
+  width: 100%; aspect-ratio: 4 / 3; border-radius: 8px; border: 1px solid var(--line);
+  /* immer hell, damit dunkle Logos sichtbar bleiben */
+  background: repeating-conic-gradient(#ece8e4 0% 25%, #ffffff 0% 50%) 0 0 / 16px 16px;
+  display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--muted); font-size: 13px;
+}
+.adm-bild-vorschau img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.adm-hinweis { font-size: 13px; color: var(--muted); padding: 8px 18px 14px; }
+.adm-karte .adm-hinweis { padding: 0; margin-bottom: 10px; }
+
+.adm-seite { position: sticky; top: 70px; }
+.adm-karte { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+.adm-karte h2 { font-size: 17px; margin-bottom: 8px; }
+.adm-karte hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+.adm-versionen { max-height: 50vh; overflow-y: auto; }
+.adm-versionen li { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 7px 0; font-size: 13.5px; }
+.adm-versionen li + li { border-top: 1px solid var(--line); }
+.adm-versionen small { display: block; color: var(--muted); font-size: 12px; }
+
+.adm-leiste {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+  display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap;
+  padding: 12px 16px; background: var(--panel); border-top: 1px solid var(--line); box-shadow: var(--shadow-lg);
+}
+.adm-status { margin-right: auto; font-size: 14px; color: var(--ink-2); }
+.adm-status.ok { color: var(--good); font-weight: 600; }
+.adm-status.fehler { color: #b3261e; font-weight: 600; }
+
+.adm-login { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.adm-login .adm-karte { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 10px; }
+.adm-login h1 { font-size: 22px; }
+.adm-login p { color: var(--ink-2); }
+.adm-login label { font-size: 13px; font-weight: 600; color: var(--muted); margin-top: 6px; }
+.adm-login input { padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--paper); color: var(--ink); font: inherit; }
+.adm-fehler { color: #b3261e !important; font-weight: 600; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .adm-warn,
+  :root:not([data-theme="light"]) .adm-status.fehler,
+  :root:not([data-theme="light"]) .adm-fehler { color: #ff8a80 !important; }
+}

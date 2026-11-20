@@ -7,8 +7,8 @@ export const FORMULAR_URL =
   "https://web.arbeitsagentur.de/portal/kontakt/de/unternehmen/unternehmensanfrage?scope=form";
 export const ANBIETER_NR = "304731";
 
-/* Bilder liegen in public/ — siehe scripts/extract-assets.mjs */
-export const BILDER = {
+/* Standardbilder in public/ — im Admin-Bereich austauschbar (lib/inhalt-speicher.ts) */
+export const STANDARD_BILDER = {
   logo: "/logo.svg",
   oscar: "/oscar.jpg",
   azav: "/siegel-azav.png",
@@ -16,6 +16,9 @@ export const BILDER = {
 };
 
 export type Angebot = {
+  /* stabile ID für den Admin-Bereich (Beschreibung ist dort bearbeitbar,
+     der amtliche Titel bleibt hier) */
+  id: string;
   titel: string;
   ue: number;
   nr: string;
@@ -33,6 +36,7 @@ export type Angebot = {
 export const ANGEBOTE: Record<string, Angebot[]> = {
   "Strategische Kundengewinnung (Vertrieb 2.0)": [
     {
+      id: "dialog",
       titel: "Als Dialogspezialist(in) erfolgreich Kunden gewinnen",
       ue: 820,
       nr: "621/138/2026",
@@ -48,6 +52,7 @@ export const ANGEBOTE: Record<string, Angebot[]> = {
   ],
   Cybersicherheit: [
     {
+      id: "cyber",
       titel: "Cyber-Security & Informationssicherheit mit NIS-2, ISMS & KI-Integration",
       ue: 400,
       nr: "621/5/26",
@@ -63,6 +68,7 @@ export const ANGEBOTE: Record<string, Angebot[]> = {
   ],
   Fördermittelmanagement: [
     {
+      id: "foerder",
       titel: "Fördermittelberater(in) für die Digitalisierung",
       ue: 500,
       nr: "621/135/2026",
@@ -78,6 +84,7 @@ export const ANGEBOTE: Record<string, Angebot[]> = {
   ],
   "Social Media Strategie": [
     {
+      id: "social",
       titel: "Social Media Manager/in",
       ue: 500,
       nr: "621/28/26",
@@ -93,6 +100,7 @@ export const ANGEBOTE: Record<string, Angebot[]> = {
   ],
   "KI Engineer": [
     {
+      id: "ki",
       titel: "KI-Engineer",
       ue: 500,
       nr: "621/137/2026",
@@ -108,18 +116,6 @@ export const ANGEBOTE: Record<string, Angebot[]> = {
   ],
 };
 
-export const FORMULAR_TEXT =
-  "Sehr geehrte Damen und Herren,\n\nwir planen, interne Mitarbeitende im Rahmen der Bildungsgutscheine weiterzubilden. Senden Sie uns hierfür bitte den Erhebungsbogen sowie die weiteren Daten und Unterlagen zu, die Sie hierfür von uns benötigen.\n\nHerzlichen Dank für Ihre Unterstützung";
-
-/* ------------------------------------------------------------------
-   KUNDENSTIMMEN — hier echte Bewertungen eintragen.
-   Solange die Liste leer ist, bleibt der Block auf der Folie
-   "Unsere Dozenten" unsichtbar. Es werden bewusst keine erfundenen
-   Bewertungen ausgeliefert. "sterne" ist optional (1–5).
-   ------------------------------------------------------------------ */
-export type Kundenstimme = { text: string; quelle?: string; sterne?: number };
-export const KUNDENSTIMMEN: Kundenstimme[] = [];
-
 export type Exp = "genutzt" | "gehoert" | "neu";
 
 export type Size = "klein" | "mittel" | "gross";
@@ -130,40 +126,42 @@ export const RATES: Record<Size, Rate> = {
   gross: { kurs: 0.25, lohn: 0.25 },
 };
 
+/* Programme der Folie "Weiterbildungen": "prog" ist der Schlüssel (auch in
+   ANGEBOTE und in den Einsendungen), Titel und Text sind im Admin-Bereich bearbeitbar */
 export const PROGRAMME = [
   {
+    id: "vertrieb",
     prog: "Strategische Kundengewinnung (Vertrieb 2.0)",
     titel: "Strategische Kundengewinnung",
     text: "Kunden gezielt gewinnen — von der Adressrecherche und dem richtigen Ansprechpartner über Nutzenargumentation, aktives Zuhören und Fragetechnik bis zur souveränen Einwandbehandlung. Die Teilnehmenden erarbeiten ihren eigenen Gesprächsleitfaden und stärken ihre Eigenmotivation für nachhaltigen Vertriebserfolg.",
-    ue: "820 UE · 34 Wochen · AZAV-zugelassen",
     url: "https://vertriebskurs.seminarkontor.com/",
   },
   {
+    id: "cyber",
     prog: "Cybersicherheit",
     titel: "Cybersicherheit",
     text: "Informationssicherheit praxisnah im Unternehmen verankern: Phishing und Social Engineering erkennen, die NIS-2-Pflichten verstehen und ein ISMS nach ISO 27001 aufbauen. Dazu technische Schutzmaßnahmen, Incident Response, Awareness für das ganze Team und der EU AI Act — mit eigenem Abschlussprojekt.",
-    ue: "400 UE · 26 Wochen · AZAV-zugelassen",
     url: "https://cybersecurity-training.seminarkontor.com/",
   },
   {
+    id: "foerder",
     prog: "Fördermittelmanagement",
     titel: "Fördermittelmanagement",
     text: "Fördermittel systematisch erschließen: Programme recherchieren und bewerten, Anträge professionell stellen und abwickeln, Nachweise und Berichte sauber führen — mit Schwerpunkt Digitalisierung, u. a. BAFA und Landesprogramme.",
-    ue: "500 UE · 26 Wochen · AZAV-zugelassen",
     url: "https://foerdermittelkurs.seminarkontor.com/",
   },
   {
+    id: "social",
     prog: "Social Media Strategie",
     titel: "Social Media Strategie",
     text: "Social Media für Sichtbarkeit, Kunden- und Mitarbeitergewinnung nutzen: Strategie und Redaktionsplanung, Content für Text, Bild und Video, Community Management sowie Planung und Optimierung bezahlter Kampagnen. Mit Analysetools messen die Teilnehmenden den Erfolg und steuern datenbasiert nach.",
-    ue: "500 UE · 26 Wochen · AZAV-zugelassen",
     url: "https://socialmediakurs.seminarkontor.com/",
   },
   {
+    id: "ki",
     prog: "KI Engineer",
     titel: "KI Engineer",
     text: "KI sicher und produktiv im Arbeitsalltag einsetzen: Grundlagen und Grenzen von KI, DSGVO-konformer Umgang, strukturiertes Prompting und Content mit gängigen Tools. Die Teilnehmenden finden KI-Potenziale im eigenen Unternehmen und automatisieren Abläufe, etwa mit Zapier, Make oder n8n.",
-    ue: "500 UE · 26 Wochen · AZAV-zugelassen",
     url: "https://ki-akademie.seminarkontor.com/",
   },
 ];

@@ -1,13 +1,21 @@
-/* Alle sichtbaren Texte der Konsole. */
-import type { ReactNode } from "react";
+/* Standardtexte der Konsole — nur reine Texte, damit sie im Admin-Bereich
+   (/admin) bearbeitet werden können. Änderungen aus dem Admin-Bereich
+   liegen in data/inhalt/ und überschreiben diese Werte.
+
+   Schreibweisen:
+   **fett**            Hervorhebung
+   {n}                 Platzhalter, wird live ersetzt (z. B. Anzahl)
+   {n:Person|Personen} Einzahl/Mehrzahl abhängig von n */
 import type { Exp, SlideId, Size } from "@/lib/data";
 
-type Req = "std" | "abschluss" | "sv";
+export type Req = "std" | "abschluss" | "sv";
 type Paar = [string, string];
 
 const de = {
-  locale: "de-DE",
-  pctSuffix: " %",
+  meta: {
+    titel: "Förderplan-Konsole",
+    beschreibung: "Interaktive Beratung zum Bildungsgutschein — Seminarkontor GmbH",
+  },
   logoAlt: "Seminarkontor GmbH",
   navAria: "Präsentationsabschnitte",
   reset: "Zurücksetzen",
@@ -49,11 +57,11 @@ const de = {
     lede: "Bevor wir über Förderung sprechen: Erzählen Sie mir kurz, wer Sie sind und was Sie gerade beschäftigt. Ich stelle mich genauso vor. Die Notizen hier helfen mir, alles Weitere auf Ihre Situation zuzuschneiden.",
     fahrplanTitel: "Unser Fahrplan für die nächsten Minuten",
     fahrplan: [
-      <>Kurz kennenlernen und klären, wo bei Ihnen Know-how fehlt.</>,
-      <>Ihre <strong>konkrete Förderquote</strong> bestimmen — abhängig von der Unternehmensgröße.</>,
-      <>Prüfen, ob Ihre Mitarbeitenden die <strong>Voraussetzungen erfüllen</strong>.</>,
-      <>Eine <strong>Zahl für Ihr Budget</strong> rechnen — und den nächsten Schritt festlegen.</>,
-    ] as ReactNode[],
+      "Kurz kennenlernen und klären, wo bei Ihnen Know-how fehlt.",
+      "Ihre **konkrete Förderquote** bestimmen — abhängig von der Unternehmensgröße.",
+      "Prüfen, ob Ihre Mitarbeitenden die **Voraussetzungen erfüllen**.",
+      "Eine **Zahl für Ihr Budget** rechnen — und den nächsten Schritt festlegen.",
+    ],
     fahrplanNotiz: "Kein Verkaufsgespräch mit Abschlussdruck: Am Ende entscheiden Sie nur, ob sich eine unverbindliche Prüfung durch die Agentur für Arbeit für Sie lohnt.",
     proofTitel: "Die Mittel stehen bereit — und zwar dauerhaft.",
     proofLede: "Der Bildungsgutschein ist kein befristetes Sonderprogramm mit gedeckeltem Topf, der plötzlich ausgeschöpft ist. Er ist ein laufendes Regelinstrument nach § 82 SGB III und wird aus Beitragsmitteln der Bundesagentur für Arbeit finanziert.",
@@ -82,15 +90,16 @@ const de = {
   seminarkontor: {
     lede: "Gegründet von Oscar Nobre, mit Sitz in Leinfelden-Echterdingen. Wir beraten mittelständische Unternehmen im Vertrieb und führen Trainings und Coachings durch — mit einem Kompetenzteam aus erfahrenen Trainern und Beratern.",
     fakten: ["Gegründet 2002", "Leinfelden-Echterdingen", "HRB 25154 · AG Stuttgart", "Zertifizierter Bildungsträger"],
+    oscarName: "Oscar Nobre",
     oscarRolle: "Gründer & Geschäftsführer, Trainer & Coach",
     oscarText: "Ihr fester Ansprechpartner — von der ersten Beratung bis zum erfolgreichen Weiterbildungsabschluss.",
     zertTitel: "Zertifizierungen & Zulassungen",
     zert: [
-      <><strong>AZAV-zertifiziert</strong> — Voraussetzung dafür, dass ein Bildungsgutschein bei uns überhaupt einlösbar ist.</>,
-      <><strong>ISO 9001:2015</strong> zertifiziertes Qualitätsmanagement.</>,
-      <>Gelistet im Förderprogramm <strong>go-digital</strong>.</>,
-      <>Zugelassen für <strong>ESF-Beratung</strong> (L-Bank Baden-Württemberg).</>,
-    ] as ReactNode[],
+      "**AZAV-zertifiziert** — Voraussetzung dafür, dass ein Bildungsgutschein bei uns überhaupt einlösbar ist.",
+      "**ISO 9001:2015** zertifiziertes Qualitätsmanagement.",
+      "Gelistet im Förderprogramm **go-digital**.",
+      "Zugelassen für **ESF-Beratung** (L-Bank Baden-Württemberg).",
+    ],
     fussnote: "Wie wir unterrichten und wer vor Ihren Mitarbeitenden steht, sehen Sie auf der nächsten Folie.",
   },
 
@@ -123,10 +132,10 @@ const de = {
     ] as Paar[],
     nutzenTitel: "Was Weiterbildung im Bestand leistet",
     nutzen: [
-      <><strong>Wettbewerbsfähigkeit</strong> — qualifizierte Teams reagieren schneller auf Marktveränderungen.</>,
-      <><strong>Mitarbeiterbindung</strong> — Entwicklungsperspektiven sind der stärkste Hebel gegen Fluktuation.</>,
-      <><strong>Kostenvorteil</strong> — bestehende Mitarbeitende zu qualifizieren ist bis zu 6× günstiger als Neueinstellungen.</>,
-    ] as ReactNode[],
+      "**Wettbewerbsfähigkeit** — qualifizierte Teams reagieren schneller auf Marktveränderungen.",
+      "**Mitarbeiterbindung** — Entwicklungsperspektiven sind der stärkste Hebel gegen Fluktuation.",
+      "**Kostenvorteil** — bestehende Mitarbeitende zu qualifizieren ist bis zu 6× günstiger als Neueinstellungen.",
+    ],
     schluss: [
       "Die gute Nachricht: Diese Lücke müssen Sie nicht aus eigener Tasche schließen.",
       "Wer seine Mitarbeitenden jetzt qualifiziert, sichert sich den Vorsprung — und der Staat trägt einen Großteil der Kosten. Lassen Sie uns gemeinsam prüfen, wie viel davon auf Ihr Unternehmen entfällt.",
@@ -167,17 +176,16 @@ const de = {
   voraus: {
     h2: "Erfüllen Ihre Mitarbeitenden die Voraussetzungen?",
     lede: "Drei Kriterien entscheiden. Klicken Sie an, was auf Ihre Belegschaft zutrifft — wir prüfen live mit.",
-    kriterien: [
-      ["std", "Mindestens 20 Stunden pro Woche beschäftigt", "Teilzeit ab 20 h/Woche ist ausreichend."],
-      ["abschluss", "Ausbildungsabschluss oder Studium liegt mindestens 2 Kalenderjahre zurück", "Gerechnet ab dem Abschlussjahr."],
-      ["sv", "Sozialversicherungspflichtiges Beschäftigungsverhältnis", "Minijob und Geschäftsführer ohne SV-Pflicht sind ausgeschlossen."],
-    ] as [Req, string, string][],
-    urteil: (n: number) =>
-      n === 3
-        ? "Alle drei Voraussetzungen sind erfüllt — die Beantragung eines Bildungsgutscheins ist möglich. Nächster Schritt: Erhebungsbogen."
-        : n > 0
-          ? n + " von 3 Kriterien erfüllt. Auch bei Unsicherheit lohnt die Prüfung — Einzelfälle klären wir direkt mit der Agentur für Arbeit."
-          : "Wählen Sie die zutreffenden Punkte aus.",
+    kriterien: {
+      std: ["Mindestens 20 Stunden pro Woche beschäftigt", "Teilzeit ab 20 h/Woche ist ausreichend."],
+      abschluss: ["Ausbildungsabschluss oder Studium liegt mindestens 2 Kalenderjahre zurück", "Gerechnet ab dem Abschlussjahr."],
+      sv: ["Sozialversicherungspflichtiges Beschäftigungsverhältnis", "Minijob und Geschäftsführer ohne SV-Pflicht sind ausgeschlossen."],
+    } as Record<Req, Paar>,
+    urteilAlle:
+      "Alle drei Voraussetzungen sind erfüllt — die Beantragung eines Bildungsgutscheins ist möglich. Nächster Schritt: Erhebungsbogen.",
+    urteilTeil:
+      "{n} von 3 Kriterien erfüllt. Auch bei Unsicherheit lohnt die Prüfung — Einzelfälle klären wir direkt mit der Agentur für Arbeit.",
+    urteilKeine: "Wählen Sie die zutreffenden Punkte aus.",
     schluss: [
       "Bei Unsicherheit im Einzelfall klären wir die Voraussetzungen direkt mit der Agentur für Arbeit.",
       "Das kostet Sie nichts und geht schneller, als die Frage offenzulassen.",
@@ -188,26 +196,21 @@ const de = {
     h2: "Wie viele Bildungsgutscheine sind bei Ihnen realistisch?",
     lede: "Die Agentur für Arbeit fördert nicht die gesamte Belegschaft auf einmal. Als Orientierung gilt eine einfache Faustregel — tragen Sie Ihre Mitarbeiterzahl ein.",
     kartenTitel: "Wie viele Gutscheine sind realistisch?",
-    regel: <>Faustregel der Arbeitsagentur: <strong>1 Bildungsgutschein pro 5 Vollzeit-Mitarbeitende.</strong></>,
+    regel: "Faustregel der Arbeitsagentur: **1 Bildungsgutschein pro 5 Vollzeit-Mitarbeitende.**",
     maLabel: "Vollzeit-Mitarbeitende im Unternehmen",
     maPlatzhalter: "z. B. 30",
     figK: "Bildungsgutscheine sind bei dieser Belegschaftsgröße als Orientierung realistisch",
     bgsLabel: "Bildungsgutscheine (anpassbar)",
-    bgsVorschlag: (n: number) => "Vorschlag nach Faustregel: " + n,
-    bgsUebernehmen: (n: number) => "Vorschlag (" + n + ") übernehmen",
+    bgsVorschlag: "Vorschlag nach Faustregel: {n}",
+    bgsUebernehmen: "Vorschlag ({n}) übernehmen",
     empfK: "Unsere Empfehlung",
-    empf: (
-      <>
-        Unabhängig davon, wie viele Förderungen grundsätzlich möglich wären, empfehlen wir, zunächst mit{" "}
-        <strong>zwei Teilnehmenden</strong> zu starten. So kann der Prozess sauber angestoßen, die Umsetzung im
-        Unternehmen erprobt und anschließend auf weitere Mitarbeitende ausgeweitet werden.
-      </>
-    ),
+    empf: "Unabhängig davon, wie viele Förderungen grundsätzlich möglich wären, empfehlen wir, zunächst mit **zwei Teilnehmenden** zu starten. So kann der Prozess sauber angestoßen, die Umsetzung im Unternehmen erprobt und anschließend auf weitere Mitarbeitende ausgeweitet werden.",
     fussnote: "Die Faustregel ist eine Orientierung, keine feste Obergrenze. Maßgeblich ist die Einzelfallprüfung durch die Agentur für Arbeit.",
   },
 
   weiterbildungen: {
     h2: "Welche Kompetenzen fehlen Ihnen im Team?",
+    kursMeta: "{ue} UE · {wochen} Wochen · AZAV-zugelassen",
     lede: "AZAV-zertifiziert, 100 % online im digitalen Klassenzimmer: 400 bis 820 Unterrichtseinheiten in 26 bis 34 Wochen bei rund 11 bis 15 Stunden pro Woche. Praxisnahes Live-Training mit erfahrenen Dozenten, ergänzt durch Transferaufgaben, betreute Lernphasen und regelmäßige Lernzielkontrollen.",
     azav: [
       "Zugelassen durch die GUTcert GmbH, akkreditiert von der DAkkS. Fachbereich: Maßnahmen der beruflichen Weiterbildung nach SGB III. Ohne diese Zulassung wäre hier kein Bildungsgutschein einlösbar.",
@@ -233,13 +236,13 @@ const de = {
     aufschluesselung: "So setzt sich die Förderung zusammen",
     zeilen: {
       kosten: "Kurskosten je Teilnehmer",
-      kursFoerder: (p: string) => "davon gefördert (" + p + ")",
+      kursFoerder: "davon gefördert ({p})",
       stundenlohn: "Stundenlohn (brutto)",
-      lohnGesamt: (m: number) => "Lohnkosten der Weiterbildungsstunden über " + m + " Monate",
-      lohnFoerder: (p: string) => "davon bezuschusst (" + p + ")",
+      lohnGesamt: "Lohnkosten der Weiterbildungsstunden über {m} {m:Monat|Monate}",
+      lohnFoerder: "davon bezuschusst ({p})",
       lohnProMonat: "Lohnkostenzuschuss je Monat",
       jeTn: "Förderung je Teilnehmer",
-      gesamt: (n: number) => "Gesamtförderung für " + n + " Teilnehmende",
+      gesamt: "Gesamtförderung für {n} Teilnehmende",
     },
     keineGroesse: "Unternehmensgröße noch nicht gewählt",
     kostenHinweis: "aus der gewählten Weiterbildung — hier anpassbar",
@@ -260,21 +263,20 @@ const de = {
     ] as Paar[],
     todoTitel: "Was Sie dafür tun müssen",
     todo: [
-      () => "Intern geeignete Mitarbeitende identifizieren.",
-      (berater: string) => "Termin mit " + berater + " vereinbaren.",
-      () => "Erhebungsbogen gemeinsam ausfüllen — den Rest übernehmen wir.",
-    ] as ((berater: string) => string)[],
+      "Intern geeignete Mitarbeitende identifizieren.",
+      "Termin mit {berater} vereinbaren.",
+      "Erhebungsbogen gemeinsam ausfüllen — den Rest übernehmen wir.",
+    ],
     tnTitel: "Teilnehmende intern festlegen",
-    tnText: (n: number) =>
-      "Nach Ihrer Rechnung sind das " + n + (n === 1 ? " Person" : " Personen") + ". Wer genau qualifiziert werden soll, brauchen wir für die Antragstellung.",
+    tnText: "Nach Ihrer Rechnung sind das {n} {n:Person|Personen}. Wer genau qualifiziert werden soll, brauchen wir für die Antragstellung.",
     anzahl: "Anzahl Personen",
     spalten: ["Vorname", "Name", "Weiterbildung", "Position heute"],
     positionPlatzhalter: "z. B. Innendienst",
     aria: {
-      vorname: (i: number) => "Vorname Person " + i,
-      name: (i: number) => "Name Person " + i,
-      kurs: (i: number) => "Weiterbildung Person " + i,
-      position: (i: number) => "Position heute, Person " + i,
+      vorname: "Vorname Person {i}",
+      name: "Name Person {i}",
+      kurs: "Weiterbildung Person {i}",
+      position: "Position heute, Person {i}",
     },
     hinweis: "Nicht alles muss jetzt feststehen — den Rest ergänzen wir beim gemeinsamen Termin.",
   },
@@ -318,6 +320,7 @@ const de = {
     ledeVor: " Den Erhebungsbogen für die geförderte Weiterbildung beantragen wir am besten gleich gemeinsam über die ",
     ledeLink: "Online-Anfrage der Agentur für Arbeit",
     telK: "Telefonisch · gebührenfrei",
+    telV: "0800 4 555520",
     telS: "Zentraler Arbeitgeber-Service der Agentur für Arbeit",
     webK: "Online",
     webV: "Kontaktformular",
@@ -326,7 +329,8 @@ const de = {
     bereitText: "Alles, was wir gerade gemeinsam eingetragen haben — zum Vorlesen am Telefon oder zum Ausfüllen online.",
     nachrichtTitel: "Nachricht für das Kontaktformular",
     nachrichtText: "Wird beim Klick auf „Online-Anfrage“ bzw. „Kontaktformular“ automatisch kopiert — im Formular bei „Nachricht“ mit Strg + V einfügen.",
-    nachrichtUebersetzung: null as string | null,
+    nachricht:
+      "Sehr geehrte Damen und Herren,\n\nwir planen, interne Mitarbeitende im Rahmen der Bildungsgutscheine weiterzubilden. Senden Sie uns hierfür bitte den Erhebungsbogen sowie die weiteren Daten und Unterlagen zu, die Sie hierfür von uns benötigen.\n\nHerzlichen Dank für Ihre Unterstützung",
     kopieren: "Nachricht kopieren",
     zeilen: {
       firma: "Unternehmen",
@@ -354,7 +358,7 @@ const de = {
       kurs: "Fördersatz Weiterbildungskosten",
       lohn: "Fördersatz Lohnkosten",
       req: "Voraussetzungen geprüft",
-      reqWert: (n: number) => n + " von 3",
+      reqWert: "{n} von 3",
       ma: "Mitarbeitende im Unternehmen",
       gutscheine: "Mögliche Bildungsgutscheine",
       progs: "Gewählte Weiterbildungen",
@@ -384,7 +388,7 @@ const de = {
     csv: "Als CSV herunterladen",
     ok: "Vielen Dank — Ihre Angaben wurden übermittelt.",
     fehler: "Das Absenden hat nicht geklappt. Bitte versuchen Sie es erneut oder laden Sie die CSV herunter.",
-    fehlt: (felder: string[]) => "Bitte noch ausfüllen: " + felder.join(", ") + ".",
+    fehlt: "Bitte noch ausfüllen: {felder}.",
     mailUngueltig: "Bitte eine gültige E-Mail-Adresse eintragen.",
   },
 
@@ -393,16 +397,16 @@ const de = {
     fuer: "für ",
     groesse: "Unternehmensgröße",
     satz: "Fördersatz",
-    satzWert: (k: string, l: string) => k + " Kurskosten · " + l + " Lohnkosten",
+    satzWert: "{k} Kurskosten · {l} Lohnkosten",
     req: "Voraussetzungen",
     reqAlle: "Alle 3 erfüllt",
-    reqTeil: (n: number) => n + " von 3 geprüft",
+    reqTeil: "{n} von 3 geprüft",
     gutscheine: "Mögliche Gutscheine",
-    gutscheineWert: (g: number, ma: number) => g + " Gutscheine (bei " + ma + " Mitarbeitenden)",
+    gutscheineWert: "{g} {g:Gutschein|Gutscheine} (bei {ma} Mitarbeitenden)",
     progs: "Gewählte Weiterbildungen",
     foerderung: "Geschätzte Förderung",
   },
 };
 
-export const TEXTE = de;
+export const STANDARD_TEXTE = de;
 export type Texte = typeof de;
