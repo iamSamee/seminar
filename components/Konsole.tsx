@@ -121,7 +121,22 @@ function PlanItem({ k, v, filled, money }: { k: string; v: string; filled: boole
   );
 }
 
-export default function Konsole({ berater, inhalt }: { berater: BeraterOeffentlich; inhalt: Inhalt }) {
+export default function Konsole({
+  berater,
+  inhalt,
+  vorschau = false,
+  ziel,
+  onFolie,
+}: {
+  berater: BeraterOeffentlich;
+  inhalt: Inhalt;
+  /* Live-Vorschau im Admin-Bereich: nichts wird gesendet */
+  vorschau?: boolean;
+  /* Folie, die der Editor anzeigen möchte (nonce: auch bei gleicher Folie neu auslösen) */
+  ziel?: { folie: number; nonce: number };
+  /* meldet jeden Folienwechsel (Navigator im Admin-Bereich) */
+  onFolie?: (i: number) => void;
+}) {
   const t = inhalt.texte;
   const bilder = inhalt.bilder;
   /* Anzeigenamen (bearbeitbar) zu Programm-Schlüsseln und Angeboten */
@@ -195,6 +210,16 @@ export default function Konsole({ berater, inhalt }: { berater: BeraterOeffentli
   };
 
   /* ---------- Idealer Folgetermin: 5 Tage nach der Beratung ---------- */
+  useEffect(() => {
+    onFolie?.(idx);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx]);
+
+  useEffect(() => {
+    if (ziel) go(ziel.folie);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ziel]);
+
   useEffect(() => {
     const d = new Date();
     d.setHours(12, 0, 0, 0);
@@ -428,6 +453,10 @@ export default function Konsole({ berater, inhalt }: { berater: BeraterOeffentli
 
   const absenden = async () => {
     if (sende === "sending" || sende === "ok") return;
+    if (vorschau) {
+      zeigeHinweis("Vorschau: Hier wird nichts gesendet.");
+      return;
+    }
     const fehlend = PFLICHT.filter((k) => !txt(k)).map((k) => t.angaben.felder[k][0]);
     const hinweis = fehlend.length
       ? fill(t.absenden.fehlt, { felder: fehlend.join(", ") })

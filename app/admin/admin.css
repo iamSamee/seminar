@@ -98,3 +98,79 @@
   :root:not([data-theme="light"]) .adm-status.fehler,
   :root:not([data-theme="light"]) .adm-fehler { color: #ff8a80 !important; }
 }
+
+/* ============ Split-Ansicht mit Live-Vorschau ============ */
+.adm-split { max-width: none; height: 100dvh; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.adm-split .adm-kopf { padding: 14px 20px 12px; margin: 0; border-bottom: 1px solid var(--line); background: var(--panel); }
+.adm-split .adm-kopf h1 { font-size: 19px; margin-bottom: 2px; }
+.adm-split .adm-kopf p { font-size: 13.5px; max-width: 760px; }
+.adm-kopf-aktionen { align-items: center; }
+
+.adm-segment { display: inline-flex; border: 1px solid var(--line-2); border-radius: 8px; overflow: hidden; }
+.adm-segment button { border: 0; background: var(--panel); padding: 8px 12px; font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--ink-2); }
+.adm-segment button + button { border-left: 1px solid var(--line-2); }
+.adm-segment button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+
+.adm-arbeit { flex: 1; min-height: 0; display: grid; grid-template-columns: 440px minmax(0, 1fr); }
+.adm-split.ohne-vorschau .adm-arbeit { grid-template-columns: minmax(0, 860px); justify-content: center; }
+.adm-panel { overflow-y: auto; padding: 0 14px 90px; border-right: 1px solid var(--line); background: var(--paper); overscroll-behavior: contain; }
+
+.adm-panel .adm-gruppe > summary { padding: 12px 14px; font-size: 14.5px; }
+.adm-panel .adm-feld { padding: 10px 14px; }
+.adm-panel .adm-bilder { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 14px; }
+.adm-feld.aktiv { border-left-color: #2b7cff; background: rgba(43, 124, 255, .06); }
+.adm-feld.aktiv textarea { border-color: #2b7cff; }
+.adm-bild.aktiv .adm-bild-vorschau { outline: 2px solid #2b7cff; outline-offset: 2px; }
+button.adm-bild-vorschau { padding: 0; cursor: pointer; }
+.adm-info { color: #2b7cff; font-family: var(--sans); font-weight: 600; }
+.adm-versionen-box { padding: 14px; }
+.adm-versionen-box .adm-hinweis { padding: 0 0 8px; }
+.adm-versionen-box .adm-btn { margin-top: 12px; }
+
+.adm-vorschau { position: relative; overflow: hidden; background: var(--panel-2); display: flex; justify-content: center; padding: 16px 16px 76px; }
+.adm-vorschau-rahmen { height: 100%; border-radius: 10px; overflow: hidden; box-shadow: var(--shadow-lg); background: var(--paper); }
+.adm-vorschau-rahmen iframe { display: block; border: 0; transform-origin: top left; background: var(--paper); }
+
+@media (max-width: 1000px) {
+  .adm-split { height: auto; overflow: visible; }
+  .adm-arbeit { grid-template-columns: 1fr; }
+  .adm-vorschau { display: none; }
+  .adm-panel { overflow: visible; border-right: 0; }
+}
+
+/* ============ Navigator ============ */
+.adm-nav { position: sticky; top: 0; z-index: 3; background: var(--paper); padding-top: 12px; margin: 0 -14px; padding-left: 14px; padding-right: 14px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.adm-nav-kopf { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 8px; }
+.adm-nav-kopf b { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.adm-nav-kopf label { display: inline-flex; gap: 6px; align-items: center; color: var(--ink-2); cursor: pointer; }
+.adm-nav-leiste { display: flex; flex-wrap: wrap; gap: 4px; }
+.adm-nav-leiste button {
+  position: relative; min-width: 30px; height: 30px; padding: 0 8px; border-radius: 7px;
+  border: 1px solid var(--line-2); background: var(--panel); color: var(--ink-2);
+  font: 600 13px/1 var(--sans); cursor: pointer; font-variant-numeric: tabular-nums;
+}
+.adm-nav-leiste button:hover { border-color: #2b7cff; color: #2b7cff; }
+.adm-nav-leiste button[aria-pressed="true"] { background: #2b7cff; border-color: #2b7cff; color: #fff; }
+.adm-nav-leiste button.live::after {
+  content: ""; position: absolute; right: 3px; top: 3px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+}
+.adm-nav .adm-suche { position: static; padding: 10px 0 12px; }
+
+.adm-folie-kopf { padding: 2px 4px 10px; }
+.adm-folie-kopf span { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.adm-folie-kopf h2 { font-size: 18px; margin-top: 2px; }
+.adm-zahl { font-size: 12px; font-weight: 600; color: var(--muted); background: var(--panel-2); padding: 1px 8px; border-radius: 999px; }
+
+.adm-elemente ol { list-style: none; margin: 0; padding: 6px; max-height: 320px; overflow-y: auto; }
+.adm-elemente li button {
+  width: 100%; display: flex; flex-direction: column; gap: 1px; text-align: left; cursor: pointer;
+  padding: 7px 10px; border: 0; border-left: 3px solid transparent; border-radius: 6px; background: none; color: var(--ink);
+}
+.adm-elemente li button:hover { background: rgba(43, 124, 255, .07); }
+.adm-elemente li button.aktiv { background: rgba(43, 124, 255, .12); border-left-color: #2b7cff; }
+.adm-elemente li button.geaendert .adm-el-typ::after { content: " · geändert"; color: var(--accent); }
+.adm-el-typ { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.adm-el-text { font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm-folie-felder { padding: 0; overflow: hidden; }
+.adm-bilder.einzeln { grid-template-columns: minmax(0, 220px); padding: 12px 14px; }
+.adm-folie-blaettern { display: flex; justify-content: space-between; margin: 4px 0 12px; }

@@ -754,3 +754,26 @@ a.kanal:hover { border-color: var(--accent); background: var(--accent-soft); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* ============ LIVE-VORSCHAU (nur im Admin-iframe, /?vorschau=1) ============ */
+.vorschau-rahmen {
+  position: fixed; left: 0; top: 0; z-index: 9999; display: none; pointer-events: none;
+  border: 2px solid #2b7cff; border-radius: 6px; background: rgba(43, 124, 255, .07);
+  transition: transform .18s ease, width .18s ease, height .18s ease;
+}
+.vorschau-rahmen span {
+  position: absolute; left: -2px; bottom: 100%; margin-bottom: 2px; white-space: nowrap;
+  background: #2b7cff; color: #fff; font: 600 11px/1.6 var(--sans); padding: 1px 8px; border-radius: 4px 4px 0 0;
+  max-width: 60vw; overflow: hidden; text-overflow: ellipsis;
+}
+.vorschau-rahmen.hover { border-style: dashed; border-width: 1.5px; background: rgba(43, 124, 255, .04); transition: none; }
+.vorschau-rahmen.hover span { opacity: .85; }
+.vorschau-hinweis {
+  position: fixed; left: 50%; bottom: 76px; transform: translateX(-50%); z-index: 9999; max-width: min(520px, 92vw);
+  background: #2b7cff; color: #fff; padding: 10px 14px; border-radius: 10px; font-size: 14px; line-height: 1.45;
+  box-shadow: var(--shadow-lg);
+}
+.vorschau-hinweis b { display: block; font-size: 12px; opacity: .85; }
+body.vorschau-modus .shell :is(h1, h2, h3, h4, p, li, label, figcaption, .k, .kanal-s, .kanal-v, .kanal-k, .pc-t, .pc-d, .pc-ue, .t-main, .t-sub, .verdict, img):hover {
+  outline: 1px dashed rgba(43, 124, 255, .7); outline-offset: 2px; cursor: pointer;
+}

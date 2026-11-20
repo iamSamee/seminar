@@ -39,3 +39,26 @@ export function md(vorlage: string, werte?: Werte): ReactNode {
 export function platzhalter(vorlage: string): string[] {
   return [...new Set([...vorlage.matchAll(/\{(\w+)(?::[^{}]*)?\}/g)].map((m) => m[1]))];
 }
+
+/* Setzt einen Text im verschachtelten Inhalt anhand des Pfads "a.b.0" —
+   nur wenn dort bereits ein Text steht (unbekannte Pfade werden ignoriert) */
+export function setzePfad(ziel: unknown, pfad: string, wert: string) {
+  const teile = pfad.split(".");
+  let o = ziel as Record<string, unknown>;
+  for (const t of teile.slice(0, -1)) {
+    if (!o || typeof o[t] !== "object") return;
+    o = o[t] as Record<string, unknown>;
+  }
+  const letzter = teile[teile.length - 1];
+  if (o && typeof o[letzter] === "string") o[letzter] = wert;
+}
+
+/* Feste Textstücke einer Vorlage (ohne Platzhalter und **), längste zuerst —
+   damit findet die Live-Vorschau den Text auf der Seite wieder */
+export function textStuecke(vorlage: string): string[] {
+  return vorlage
+    .split(/\{\w+(?::[^{}]*)?\}|\*\*|\n/)
+    .map((s) => s.trim())
+    .filter((s) => s.length >= 2)
+    .sort((a, b) => b.length - a.length);
+}

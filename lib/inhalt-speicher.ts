@@ -10,7 +10,7 @@ import { mkdir, readdir, readFile, rename, rm, writeFile } from "node:fs/promise
 import path from "node:path";
 import { BERATER } from "@/lib/berater";
 import { ANGEBOTE, PROGRAMME, STANDARD_BILDER } from "@/lib/data";
-import type { Inhalt } from "@/lib/inhalt";
+import { setzePfad, type Inhalt } from "@/lib/inhalt";
 import { STANDARD_TEXTE } from "@/lib/texte-standard";
 
 export type Aenderungen = Record<string, string>;
@@ -51,16 +51,6 @@ export function flach(obj: unknown, prefix = ""): Aenderungen {
   return out;
 }
 
-function setze(ziel: unknown, pfad: string, wert: string) {
-  const teile = pfad.split(".");
-  let o = ziel as Record<string, unknown>;
-  for (const t of teile.slice(0, -1)) {
-    if (!o || typeof o[t] !== "object") return;
-    o = o[t] as Record<string, unknown>;
-  }
-  if (o && typeof o[teile[teile.length - 1]] === "string") o[teile[teile.length - 1]] = wert;
-}
-
 /* ---------- Lesen ---------- */
 async function leseJson<T>(datei: string, ersatz: T): Promise<T> {
   try {
@@ -77,7 +67,7 @@ export async function ladeAenderungen(): Promise<Aenderungen> {
 
 export async function ladeInhalt(): Promise<Inhalt> {
   const inhalt = structuredClone(standardInhalt());
-  for (const [pfad, wert] of Object.entries(await ladeAenderungen())) setze(inhalt, pfad, wert);
+  for (const [pfad, wert] of Object.entries(await ladeAenderungen())) setzePfad(inhalt, pfad, wert);
   return inhalt;
 }
 
